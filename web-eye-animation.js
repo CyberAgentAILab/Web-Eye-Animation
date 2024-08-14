@@ -340,12 +340,6 @@
         }, reconnectInterval);
     }
 
-    // calculateCenterPoint関数のモック
-    function calculateCenterPoint(x, y, z) {
-        // 実際の計算ロジックに置き換えてください
-        return { x1: x / 2, y1: y / 2 };
-    }
-
     // WebSocket接続を開始するためのグローバル関数を設定
     window.eyes = {
         websocket: startWebSocket,
