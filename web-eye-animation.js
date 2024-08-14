@@ -1,17 +1,44 @@
 (function() {
-    // CSSを動的に読み込む
-    function loadCSS(url) {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = url;
-        document.head.appendChild(link);
-    }
-
-    // cssが読み込まれていない場合、動的に読み込む
-    if (!document.querySelector('link[href="web-eye-animation.css"]')) {
-        loadCSS('web-eye-animation.css');
+    // CSSを動的に生成して追加する関数
+    function addCSS() {
+        const style = document.createElement('style');
+        style.textContent = `
+            .eye-container {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 50vw; /* 横幅を50%に設定 */
+                height: 50vh; /* 縦幅を50%に設定 */
+                background-color: black;
+            }
+            
+            .eye {
+                position: absolute;
+                width: 10vw;
+                height: 25vh;
+                background-color: white;
+                border-radius: 50%;
+                top: 50%; /* 縦方向の中央に配置 */
+                transform: translateY(-50%);
+            }
+            
+            #leftEye {
+                left: 20%; /* eye-container内の左側に配置 */
+            }
+            
+            #rightEye {
+                right: 20%; /* eye-container内の右側に配置 */
+            }
+        `;
+        document.head.appendChild(style);
     }
     
+    // CSSが読み込まれていない場合、動的にCSSを追加
+    if (!document.querySelector('style')) {
+        addCSS();
+    }
+
     const eyeContainer = document.querySelector('.eye-container');
     if (!eyeContainer) return;
 
