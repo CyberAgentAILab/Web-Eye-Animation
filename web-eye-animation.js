@@ -283,6 +283,11 @@
 
     // WebSocketクライアントの設定
     function startWebSocket(ip_address) {
+        // 既存のWebSocket接続が存在する場合、それをクローズする
+        if (ws && ws.readyState !== WebSocket.CLOSED) {
+            ws.close();
+        }
+
         ws = new WebSocket(`wss://${ip_address}:8765`);
 
         ws.onopen = function(event) {
@@ -319,7 +324,6 @@
                     console.log('Invalid eye coordinates:', parts[1], parts[2]);
                 }
             }
-   
         };
 
         ws.onclose = function(event) {
@@ -334,9 +338,19 @@
     }
 
     function scheduleReconnect(ip_address) {
+        // 既に再接続がスケジュールされている場合は何もしない
+        if (reconnectIntervalId) {
+            return;
+        }
+
         console.log(`Attempting to reconnect in ${reconnectInterval / 1000} seconds...`);
         reconnectIntervalId = setInterval(() => {
-            eyes.websocket(ip_address);
+            if (ws.readyState === WebSocket.CLOSED) {
+                startWebSocket(ip_address);
+            } else {
+                clearInterval(reconnectIntervalId); // 接続が確立されたら再接続タイマーを停止
+                reconnectIntervalId = null;
+            }
         }, reconnectInterval);
     }
 
