@@ -8,8 +8,8 @@
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                width: 50vw; /* 横幅を50%に設定 */
-                height: 50vh; /* 縦幅を50%に設定 */
+                width: 100vw; /* 横幅を50%に設定 */
+                height: 100vh; /* 縦幅を50%に設定 */
                 background-color: black;
             }
             
@@ -225,18 +225,14 @@
     }
 
     function moveEyesTarget(x, y, z, focalLength = 1000) {
-        // スクリーンの中央を原点とする
-        const rect = eyeContainer.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
     
         // 3D空間のベクトルを2Dスクリーン平面に投影
         const projectedX = (x / (z + focalLength)) * window.innerWidth / 2;
         const projectedY = (y / (z + focalLength)) * window.innerHeight / 2;
     
         // スクリーン平面での動きの大きさを調整
-        const deltaX = (projectedX - centerX) / 15;
-        const deltaY = (projectedY - centerY) / 15;
+        const deltaX = (projectedX);
+        const deltaY = (projectedY);        
     
         // 目の動きを反映
         gsap.to(eyeElements, {
@@ -299,6 +295,7 @@
             const message = event.data;
 
             // Parse the received message
+            console.log(message);
             const parts = message.split(' ');
 
             if (parts[0] === 'emotion') {
