@@ -429,6 +429,8 @@
     // WebSocket接続を開始するためのグローバル関数を設定
     window.eyes = {
         websocket: startWebSocket,
-        emotion: runEmotion  // 関数名をrunEmotionに変更して参照
+        emotion: runEmotion,
+        move: moveEyes,
+        target: moveEyesTarget,
     };
 })();

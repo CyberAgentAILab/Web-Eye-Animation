@@ -35,12 +35,57 @@ Here's an example of how to set up the agent on your webpage:
 ```
 
 ### Controlling the Agent via JavaScript
-You can control the agent's behavior using JavaScript functions. For example:
 
-```
+You can control the agent's behavior using JavaScript functions. These functions allow for manipulating the emotions and movement of the agent's eyes.
+
+#### Emotions:
+To change the agent's emotion, you can use the `eyes.emotion()` function. Here’s an example:
+
+```javascript
 eyes.emotion("surprise");
 ```
-Available emotions include joy, sadness, surprise, anger, fear, disgust, confusion, love, sleepy, and excitement.
+
+This function takes a string representing the emotion. Available emotions include:
+
+- **joy**
+- **sadness**
+- **surprise**
+- **anger**
+- **fear**
+- **disgust**
+- **confusion**
+- **love**
+- **sleepy**
+- **excitement**
+
+Each of these emotions triggers a corresponding animation in the agent’s eyes.
+
+#### Move:
+To move the agent’s eyes to a specific pixel-based position on the screen, use the `eyes.move(x, y)` function:
+
+```javascript
+eyes.move(200, 300);
+```
+
+- **x**: The horizontal position (in pixels) from the left side of the screen.
+- **y**: The vertical position (in pixels) from the top of the screen.
+
+For example, calling `eyes.move(200, 300)` will move the eyes to a point 200 pixels to the right and 300 pixels down from the top-left corner of the screen.
+
+#### Target:
+To make the agent look at a specific point in 3D space relative to the screen, you can use the `eyes.target(x, y, z)` function:
+
+```javascript
+eyes.target(500, 0, 1000);
+```
+
+- **x**: The horizontal position of the target. The unit can be arbitrary, such as millimeters (mm), meters (m), or any other unit. Only the ratio between the values matters.
+- **y**: The vertical position of the target. The unit is also arbitrary, and only the ratio to other values is important.
+- **z**: The depth of the target, representing the distance from the screen to the target point. Again, the unit can be arbitrary.
+
+For instance, `eyes.target(500, 0, 1000)` makes the agent look at a point 500 units to the right, aligned with the horizontal center of the screen, and 1000 units away from the screen.
+
+This allows for precise control over where the agent "looks" based on coordinates in the 3D space, adding more depth to the agent's visual interaction.
 
 ### Controlling the Agent via WebSocket
 To control the agent via WebSocket, connect to the server using a secure WebSocket connection and send commands. The web-eye-animation functions as a secure WebSocket client.
