@@ -52,8 +52,6 @@
     eyeContainer.appendChild(rightEye);
 
     const eyeElements = [leftEye, rightEye];
-    let currentX = 0;
-    let currentY = 0;
     let isAnimating = false;
     let blinkTimeoutId = null;
     let ws;
@@ -62,12 +60,29 @@
 
     // GSAPの読み込み
     function loadGSAP(callback) {
+        if (typeof gsap !== "undefined") {
+            callback();  // すでに読み込まれている場合はコールバックを実行
+            return;
+        }
+
         const script = document.createElement("script");
         script.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js";
         script.onload = callback;
         document.head.appendChild(script);
     }
 
+    // GSAPの読み込みを確認してからアニメーションを実行するPromiseを返す関数
+    function ensureGSAP() {
+        return new Promise((resolve) => {
+            if (typeof gsap !== "undefined") {
+                resolve();  // GSAPがすでに読み込まれている場合は即座にresolve
+            } else {
+                loadGSAP(resolve);  // GSAPが未ロードならロードしてからresolveを実行
+            }
+        });
+    }
+
+    // 感情を表現するための基礎関数
     function expressEmotion(animationFunction) {
         if (isAnimating) return;
         isAnimating = true;
@@ -79,99 +94,127 @@
     }
 
     function expressJoy() {
-        return gsap.timeline()
-            .to(eyeElements, { borderRadius: "0%", rotate: 45, scaleY: 0.1, duration: 0.2 })
-            .to(eyeElements, { y: "-=10", duration: 0.1, yoyo: true, repeat: 3 })
-            .to(eyeElements, { borderRadius: "50%", rotate: 0, scaleY: 1, duration: 0.2 });
+        return ensureGSAP().then(() => {
+            gsap.timeline()
+                .to(eyeElements, { borderRadius: "0%", rotate: 45, scaleY: 0.1, duration: 0.2 })
+                .to(eyeElements, { y: "-=10", duration: 0.1, yoyo: true, repeat: 3 })
+                .to(eyeElements, { borderRadius: "50%", rotate: 0, scaleY: 1, duration: 0.2 });
+        });
     }
 
+    // expressSadness
     function expressSadness() {
-        return gsap.timeline()
-            .to(eyeElements, { scaleY: 0.1, duration: 0.5 })
-            .to(eyeElements, { y: "+=10", duration: 0.5 })
-            .to(eyeElements, { scaleX: 1.5, duration: 0.5 })
-            .to(eyeElements, { scaleX: 1, scaleY: 1, duration: 0.5 })
-            .to(eyeElements, { y: "-=10", duration: 0.5 });
+        return ensureGSAP().then(() => {
+            gsap.timeline()
+                .to(eyeElements, { scaleY: 0.1, duration: 0.5 })
+                .to(eyeElements, { y: "+=10", duration: 0.5 })
+                .to(eyeElements, { scaleX: 1.5, duration: 0.5 })
+                .to(eyeElements, { scaleX: 1, scaleY: 1, duration: 0.5 })
+                .to(eyeElements, { y: "-=10", duration: 0.5 });
+        });
     }
 
+    // expressSurprise
     function expressSurprise() {
-        return gsap.timeline()
-            .to(eyeElements, { scaleX: 1.5, scaleY: 1.5, duration: 0.2 })
-            .to(eyeElements, { scaleX: 1, scaleY: 1, duration: 0.3, delay: 0.5 });
+        return ensureGSAP().then(() => {
+            gsap.timeline()
+                .to(eyeElements, { scaleX: 1.5, scaleY: 1.5, duration: 0.2 })
+                .to(eyeElements, { scaleX: 1, scaleY: 1, duration: 0.3, delay: 0.5 });
+        });
     }
 
+    // expressAnger
     function expressAnger() {
-        return gsap.timeline()
-            .to(eyeElements, { scaleY: 0.5, rotate: -10, duration: 0.2 })
-            .to(eyeElements, { x: "+=10", duration: 0.1, yoyo: true, repeat: 3 })
-            .to(eyeElements, { scaleY: 1, rotate: 0, duration: 0.2 });
+        return ensureGSAP().then(() => {
+            gsap.timeline()
+                .to(eyeElements, { scaleY: 0.5, rotate: -10, duration: 0.2 })
+                .to(eyeElements, { x: "+=10", duration: 0.1, yoyo: true, repeat: 3 })
+                .to(eyeElements, { scaleY: 1, rotate: 0, duration: 0.2 });
+        });
     }
 
+    // expressFear
     function expressFear() {
-        return gsap.timeline()
-            .to(eyeElements, { scaleY: 1.5, duration: 0.2 })
-            .to(eyeElements, { y: "-=10", duration: 0.2 })
-            .to(eyeElements, { scaleX: 0.8, duration: 0.1, yoyo: true, repeat: 5 })
-            .to(eyeElements, { scaleY: 1, scaleX: 1, duration: 0.2 })
-            .to(eyeElements, { y: "+=10", duration: 0.2 });
+        return ensureGSAP().then(() => {
+            gsap.timeline()
+                .to(eyeElements, { scaleY: 1.5, duration: 0.2 })
+                .to(eyeElements, { y: "-=10", duration: 0.2 })
+                .to(eyeElements, { scaleX: 0.8, duration: 0.1, yoyo: true, repeat: 5 })
+                .to(eyeElements, { scaleY: 1, scaleX: 1, duration: 0.2 })
+                .to(eyeElements, { y: "+=10", duration: 0.2 });
+        });
     }
 
+    // expressDisgust
     function expressDisgust() {
-        return gsap.timeline()
-            .to(eyeElements, { scaleY: 0.3, rotate: -5, duration: 0.3 })
-            .to(eyeElements, { y: "+=10", duration: 0.3 })
-            .to(eyeElements, { scaleY: 1, rotate: 0, duration: 0.3, delay: 0.5 })
-            .to(eyeElements, { y: "-=10", duration: 0.3 });
+        return ensureGSAP().then(() => {
+            gsap.timeline()
+                .to(eyeElements, { scaleY: 0.3, rotate: -5, duration: 0.3 })
+                .to(eyeElements, { y: "+=10", duration: 0.3 })
+                .to(eyeElements, { scaleY: 1, rotate: 0, duration: 0.3, delay: 0.5 })
+                .to(eyeElements, { y: "-=10", duration: 0.3 });
+        });
     }
 
+    // expressConfusion
     function expressConfusion() {
-        return gsap.timeline()
-            .to(leftEye, { rotate: -20, duration: 0.2 })
-            .to(rightEye, { rotate: 20, duration: 0.2 }, "<")
-            .to(eyeElements, { y: "+=10", duration: 0.1, yoyo: true, repeat: 3 })
-            .to(eyeElements, { rotate: 0, duration: 0.2 });
+        return ensureGSAP().then(() => {
+            gsap.timeline()
+                .to(leftEye, { rotate: -20, duration: 0.2 })
+                .to(rightEye, { rotate: 20, duration: 0.2 }, "<")
+                .to(eyeElements, { y: "+=10", duration: 0.1, yoyo: true, repeat: 3 })
+                .to(eyeElements, { rotate: 0, duration: 0.2 });
+        });
     }
 
     function expressLove() {
-        return gsap.timeline()
-            .to(eyeElements, { borderRadius: "0 0 50% 50%", scaleY: 0.5, duration: 0.2 })
-            .to(eyeElements, { scaleX: 1.2, scaleY: 0.4, duration: 0.2 })
-            .to(eyeElements, { scaleX: 1, scaleY: 1, borderRadius: "50%", duration: 0.2, delay: 0.5 });
+        return ensureGSAP().then(() => {
+            gsap.timeline()
+                .to(eyeElements, { borderRadius: "0 0 50% 50%", scaleY: 0.5, duration: 0.2 })
+                .to(eyeElements, { scaleX: 1.2, scaleY: 0.4, duration: 0.2 })
+                .to(eyeElements, { scaleX: 1, scaleY: 1, borderRadius: "50%", duration: 0.2, delay: 0.5 });
+        });
     }
 
     function expressSleepy() {
-        return gsap.timeline()
-            .to(eyeElements, { scaleY: 0.3, duration: 0.5 })
-            .to(eyeElements, { y: "+=10", duration: 0.5 })
-            .to(eyeElements, { scaleY: 0.1, duration: 0.2, delay: 0.5 })
-            .to(eyeElements, { scaleY: 0.3, duration: 0.2 })
-            .to(eyeElements, { scaleY: 1, duration: 0.5 })
-            .to(eyeElements, { y: "-=10", duration: 0.5 });
+        return ensureGSAP().then(() => {
+            gsap.timeline()
+                .to(eyeElements, { scaleY: 0.3, duration: 0.5 })
+                .to(eyeElements, { y: "+=10", duration: 0.5 })
+                .to(eyeElements, { scaleY: 0.1, duration: 0.2, delay: 0.5 })
+                .to(eyeElements, { scaleY: 0.3, duration: 0.2 })
+                .to(eyeElements, { scaleY: 1, duration: 0.5 })
+                .to(eyeElements, { y: "-=10", duration: 0.5 });
+        });
     }
 
     function expressExcitement() {
-        return gsap.timeline()
-            .to(eyeElements, { scaleY: 1.2, scaleX: 1.2, duration: 0.2 })
-            .to(eyeElements, { y: "-=10", duration: 0.1, yoyo: true, repeat: 5 })
-            .to(eyeElements, { rotate: 360, duration: 0.5 })
-            .to(eyeElements, { scaleY: 1, scaleX: 1, duration: 0.2 })
-            .to(eyeElements, { rotate: 0, duration: 0.1 });
+        return ensureGSAP().then(() => {
+            gsap.timeline()
+                .to(eyeElements, { scaleY: 1.2, scaleX: 1.2, duration: 0.2 })
+                .to(eyeElements, { y: "-=10", duration: 0.1, yoyo: true, repeat: 5 })
+                .to(eyeElements, { rotate: 360, duration: 0.5 })
+                .to(eyeElements, { scaleY: 1, scaleX: 1, duration: 0.2 })
+                .to(eyeElements, { rotate: 0, duration: 0.1 });
+        });
     }
 
-    loadGSAP();
-
     function singleBlink() {
-        return gsap.timeline()
-            .to(eyeElements, { scaleY: 0.1, duration: 0.1 })
-            .to(eyeElements, { scaleY: 1, duration: 0.1 });
+        return ensureGSAP().then(() => {
+            return gsap.timeline()
+                .to(eyeElements, { scaleY: 0.1, duration: 0.1 })
+                .to(eyeElements, { scaleY: 1, duration: 0.1 });
+        });
     }
 
     function doubleBlink() {
-        return gsap.timeline()
-            .to(eyeElements, { scaleY: 0.1, duration: 0.1 })
-            .to(eyeElements, { scaleY: 1, duration: 0.1 })
-            .to(eyeElements, { scaleY: 0.1, duration: 0.1, delay: 0.1 })
-            .to(eyeElements, { scaleY: 1, duration: 0.1 });
+        return ensureGSAP().then(() => {
+            return gsap.timeline()
+                .to(eyeElements, { scaleY: 0.1, duration: 0.1 })
+                .to(eyeElements, { scaleY: 1, duration: 0.1 })
+                .to(eyeElements, { scaleY: 0.1, duration: 0.1, delay: 0.1 })
+                .to(eyeElements, { scaleY: 1, duration: 0.1 });
+        });
     }
 
     function blink() {
@@ -199,60 +242,56 @@
     }
 
     function moveEyes(x, y, reg = false) {
-        const rect = eyeContainer.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-    
-        // 正規化された座標が与えられた場合、ピクセル単位に変換
-        if (reg) {
-            x = x * window.innerWidth;
-            y = y * window.innerHeight;
-        }
-    
-        const deltaX = (x - centerX);
-        const deltaY = (y - centerY);
-    
-        gsap.to(eyeElements, {
-            x: deltaX,
-            y: deltaY,
-            duration: 0.3
+        return ensureGSAP().then(() => {
+            const rect = eyeContainer.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+        
+            // 正規化された座標が与えられた場合、ピクセル単位に変換
+            if (reg) {
+                x = x * window.innerWidth;
+                y = y * window.innerHeight;
+            }
+        
+            const deltaX = (x - centerX);
+            const deltaY = (y - centerY);
+        
+            gsap.to(eyeElements, {
+                x: deltaX,
+                y: deltaY,
+                duration: 0.3
+            });
         });
-    
-        currentX = deltaX;
-        currentY = deltaY;
     }
 
     function moveEyesTarget(x, y, z, focalLength = 1000) {
-    
-        // 3D空間のベクトルを2Dスクリーン平面に投影
-        const projectedX = (x / (z + focalLength)) * window.innerWidth / 2;
-        const projectedY = (y / (z + focalLength)) * window.innerHeight / 2;
-    
-        // スクリーン平面での動きの大きさを調整
-        const deltaX = (projectedX);
-        const deltaY = (projectedY);        
-    
-        // 目の動きを反映
-        gsap.to(eyeElements, {
-            x: deltaX,
-            y: deltaY,
-            duration: 0.3
+        return ensureGSAP().then(() => {
+            // 3D空間のベクトルを2Dスクリーン平面に投影
+            const projectedX = (x / (z + focalLength)) * window.innerWidth / 2;
+            const projectedY = (y / (z + focalLength)) * window.innerHeight / 2;
+        
+            // スクリーン平面での動きの大きさを調整
+            const deltaX = (projectedX);
+            const deltaY = (projectedY);        
+        
+            // 目の動きを反映
+            gsap.to(eyeElements, {
+                x: deltaX,
+                y: deltaY,
+                duration: 0.3
+            });
         });
-    
-        currentX = deltaX;
-        currentY = deltaY;
     }
     
 
     function resetEyes() {
-        gsap.to(eyeElements, {
-            x: 0,
-            y: 0,
-            duration: 0.5
+        return ensureGSAP().then(() => {
+            gsap.to(eyeElements, {
+                x: 0,
+                y: 0,
+                duration: 0.5
+            });
         });
-
-        currentX = 0;
-        currentY = 0;
     }
 
     // マウスムーブイベントをリッスンして目を動かす
@@ -297,7 +336,7 @@
             const parts = message.split(" ");
 
             if (parts[0] === "emotion") {
-                eyes.emotion(parts[1]);  // 呼び出しを変更
+                runEmotion(parts[1]);
             } else if (parts[0] === "eye" && parts[1] === "target" && parts.length === 6) {
                 // parts[2] = x, parts[3] = y, parts[4] = z, parts[5] = focalLength
                 const x = parseFloat(parts[2]);
@@ -349,44 +388,47 @@
         }, reconnectInterval);
     }
 
+    // runEmotion関数をグローバル変数として定義
+    function runEmotion(emotion) {
+        switch (emotion) {
+            case "joy":
+                expressEmotion(expressJoy);
+                break;
+            case "sadness":
+                expressEmotion(expressSadness);
+                break;
+            case "surprise":
+                expressEmotion(expressSurprise);
+                break;
+            case "anger":
+                expressEmotion(expressAnger);
+                break;
+            case "fear":
+                expressEmotion(expressFear);
+                break;
+            case "disgust":
+                expressEmotion(expressDisgust);
+                break;
+            case "confusion":
+                expressEmotion(expressConfusion);
+                break;
+            case "love":
+                expressEmotion(expressLove);
+                break;
+            case "sleepy":
+                expressEmotion(expressSleepy);
+                break;
+            case "excitement":
+                expressEmotion(expressExcitement);
+                break;
+            default:
+                console.log("Unknown emotion:", emotion);
+        }
+    }
+
     // WebSocket接続を開始するためのグローバル関数を設定
     window.eyes = {
         websocket: startWebSocket,
-        emotion: function(emotion) {
-            switch (emotion) {
-                case "joy":
-                    expressEmotion(expressJoy);
-                    break;
-                case "sadness":
-                    expressEmotion(expressSadness);
-                    break;
-                case "surprise":
-                    expressEmotion(expressSurprise);
-                    break;
-                case "anger":
-                    expressEmotion(expressAnger);
-                    break;
-                case "fear":
-                    expressEmotion(expressFear);
-                    break;
-                case "disgust":
-                    expressEmotion(expressDisgust);
-                    break;
-                case "confusion":
-                    expressEmotion(expressConfusion);
-                    break;
-                case "love":
-                    expressEmotion(expressLove);
-                    break;
-                case "sleepy":
-                    expressEmotion(expressSleepy);
-                    break;
-                case "excitement":
-                    expressEmotion(expressExcitement);
-                    break;
-                default:
-                    console.log("Unknown emotion:", emotion);
-            }
-        }
+        emotion: runEmotion  // 関数名をrunEmotionに変更して参照
     };
 })();
