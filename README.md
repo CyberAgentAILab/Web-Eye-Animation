@@ -2,6 +2,8 @@
 
 This JavaScript library allows you to display a simple eye-only agent on the web. It supports various features such as expressing emotions, blinking, and directing the gaze. You can control the agent either through JavaScript commands or by sending instructions via a secure WebSocket connection.
 
+![An animated demonstration](./image.gif)
+
 ## Features
 - Emotion Expression: The agent can express different emotions, providing a more interactive and engaging experience.
 - Blinking: The agent can blink at specified intervals or randomly, adding a more lifelike appearance.
@@ -21,7 +23,7 @@ Here's an example of how to set up the agent on your webpage:
 
 ```
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -85,7 +87,7 @@ eyes.target(500, 0, 1000);
 
 For instance, `eyes.target(500, 0, 1000)` makes the agent look at a point 500 units to the right, aligned with the horizontal center of the screen, and 1000 units away from the screen.
 
-This allows for precise control over where the agent "looks" based on coordinates in the 3D space, adding more depth to the agent's visual interaction.
+This allows for precise control over where the agent "looks" based on coordinates in the 3D space, with any unit of measurement, adding more depth to the agent's visual interaction.
 
 ### Controlling the Agent via WebSocket
 To control the agent via WebSocket, connect to the server using a secure WebSocket connection and send commands. The web-eye-animation functions as a secure WebSocket client.
@@ -94,9 +96,9 @@ eyes.websocket("localhost")
 ```
 To connect, you need to have a secure WebSocket server running separately.
 
-- emotion [emotion type]: Expresses the specified emotion. For available emotion types, refer to the "Controlling the Agent via JavaScript" section.
-- eye target [x] [y] [z] [focal length]: Directs the gaze to a specific 3D coordinate on the screen. The focal length represents the focus distance, with a default value of 1000. Any unit of measurement can be used, but the units for x, y, z, and focal length should be consistent.
-- eye [x] [y] [flag_rect]: Specifies the coordinates on the screen where the eyes should be positioned. If flag_rect is True, the values of x and y should range from 0 to 1. If False, the values are in pixels.
+- emotion [emotion type]: Expresses the specified emotion. For a full list of available emotions, please refer to the "Controlling the Agent via JavaScript" section.
+- eye target [x] [y] [z] [focal length]: Directs the gaze to a specific 3D coordinate. For a detailed explanation, see the "Controlling the Agent via JavaScript" section.
+- eye [x] [y] [flag_rect]: Specifies the coordinates on the screen where the eyes should be positioned. For further details, please refer to the "Controlling the Agent via JavaScript" section.
 
 ### License
 This project is licensed under the MIT License, allowing you to freely use, modify, and distribute it for both personal and commercial purposes.
