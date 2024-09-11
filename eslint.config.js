@@ -15,7 +15,7 @@ export default [
                 setInterval: "readonly",
                 WebSocket: "readonly",
                 console: "readonly",
-				gsap: "readonly", 
+                gsap: "readonly", 
             },
         },
         rules: {
