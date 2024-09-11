@@ -1,7 +1,7 @@
 (function() {
     // CSSを動的に生成して追加する関数
     function addCSS() {
-        const style = document.createElement('style');
+        const style = document.createElement("style");
         style.textContent = `
             .eye-container {
                 position: absolute;
@@ -35,20 +35,20 @@
     }
     
     // CSSが読み込まれていない場合、動的にCSSを追加
-    if (!document.querySelector('style')) {
+    if (!document.querySelector("style")) {
         addCSS();
     }
 
-    const eyeContainer = document.querySelector('.eye-container');
+    const eyeContainer = document.querySelector(".eye-container");
     if (!eyeContainer) return;
 
-    const leftEye = document.createElement('div');
-    leftEye.id = 'leftEye';
-    leftEye.className = 'eye';
+    const leftEye = document.createElement("div");
+    leftEye.id = "leftEye";
+    leftEye.className = "eye";
 
-    const rightEye = document.createElement('div');
-    rightEye.id = 'rightEye';
-    rightEye.className = 'eye';
+    const rightEye = document.createElement("div");
+    rightEye.id = "rightEye";
+    rightEye.className = "eye";
 
     eyeContainer.appendChild(leftEye);
     eyeContainer.appendChild(rightEye);
@@ -64,8 +64,8 @@
 
     // GSAPの読み込み
     function loadGSAP(callback) {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js';
+        const script = document.createElement("script");
+        script.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js";
         script.onload = callback;
         document.head.appendChild(script);
     }
@@ -258,7 +258,7 @@
     }
 
     // マウスムーブイベントをリッスンして目を動かす
-    document.addEventListener('mousemove', (event) => {
+    document.addEventListener("mousemove", (event) => {
         const rect = eyeContainer.getBoundingClientRect();
         const isInContainer = (
             event.clientX >= rect.left &&
@@ -287,7 +287,7 @@
         ws = new WebSocket(`wss://${ip_address}:8765`);
 
         ws.onopen = function(event) {
-            console.log('WebSocket connection established');
+            console.log("WebSocket connection established");
             clearInterval(reconnectIntervalId); // 接続が確立されたら再接続タイマーを停止
         };
 
@@ -296,11 +296,11 @@
 
             // Parse the received message
             console.log(message);
-            const parts = message.split(' ');
+            const parts = message.split(" ");
 
-            if (parts[0] === 'emotion') {
+            if (parts[0] === "emotion") {
                 eyes.emotion(parts[1]);  // 呼び出しを変更
-            } else if (parts[0] === 'eye' && parts[1] === 'target' && parts.length === 6) {
+            } else if (parts[0] === "eye" && parts[1] === "target" && parts.length === 6) {
                 // parts[2] = x, parts[3] = y, parts[4] = z, parts[5] = focalLength
                 const x = parseFloat(parts[2]);
                 const y = parseFloat(parts[3]);
@@ -309,27 +309,27 @@
                 if (!isNaN(x) && !isNaN(y) && !isNaN(z) && !isNaN(focalLength)) {
                     moveEyesTarget(x, y, z, focalLength);
                 } else {
-                    console.log('Invalid eye target coordinates or focalLength:', parts);
+                    console.log("Invalid eye target coordinates or focalLength:", parts);
                 }
-            } else if (parts[0] === 'eye' && parts.length === 3) {
+            } else if (parts[0] === "eye" && parts.length === 3) {
                 const x = parseFloat(parts[1]);
                 const y = parseFloat(parts[2]);
                 const rect = eyeContainer.getBoundingClientRect();
                 if (!isNaN(x) && !isNaN(y)) {
                     moveEyes(x * rect.width, y * rect.height);
                 } else {
-                    console.log('Invalid eye coordinates:', parts[1], parts[2]);
+                    console.log("Invalid eye coordinates:", parts[1], parts[2]);
                 }
             }
         };
 
         ws.onclose = function(event) {
-            console.log('WebSocket connection closed');
+            console.log("WebSocket connection closed");
             scheduleReconnect(ip_address); // 接続が閉じられたら再接続をスケジュール
         };
 
         ws.onerror = function(event) {
-            console.error('WebSocket error:', event);
+            console.error("WebSocket error:", event);
             scheduleReconnect(ip_address); // エラーが発生したら再接続をスケジュール
         };
     }
@@ -356,38 +356,38 @@
         websocket: startWebSocket,
         emotion: function(emotion) {
             switch (emotion) {
-                case 'joy':
+                case "joy":
                     expressEmotion(expressJoy);
                     break;
-                case 'sadness':
+                case "sadness":
                     expressEmotion(expressSadness);
                     break;
-                case 'surprise':
+                case "surprise":
                     expressEmotion(expressSurprise);
                     break;
-                case 'anger':
+                case "anger":
                     expressEmotion(expressAnger);
                     break;
-                case 'fear':
+                case "fear":
                     expressEmotion(expressFear);
                     break;
-                case 'disgust':
+                case "disgust":
                     expressEmotion(expressDisgust);
                     break;
-                case 'confusion':
+                case "confusion":
                     expressEmotion(expressConfusion);
                     break;
-                case 'love':
+                case "love":
                     expressEmotion(expressLove);
                     break;
-                case 'sleepy':
+                case "sleepy":
                     expressEmotion(expressSleepy);
                     break;
-                case 'excitement':
+                case "excitement":
                     expressEmotion(expressExcitement);
                     break;
                 default:
-                    console.log('Unknown emotion:', emotion);
+                    console.log("Unknown emotion:", emotion);
             }
         }
     };
