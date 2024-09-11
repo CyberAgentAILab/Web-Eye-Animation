@@ -34,10 +34,8 @@
         document.head.appendChild(style);
     }
     
-    // CSSが読み込まれていない場合、動的にCSSを追加
-    if (!document.querySelector("style")) {
-        addCSS();
-    }
+    // 動的にCSSを追加
+    addCSS();
 
     const eyeContainer = document.querySelector(".eye-container");
     if (!eyeContainer) return;
