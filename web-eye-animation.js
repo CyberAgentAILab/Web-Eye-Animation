@@ -315,13 +315,19 @@
     scheduleBlink();
 
     // WebSocketクライアントの設定
-    function startWebSocket(ip_address) {
+    // startWebSocket(host, port?, protocol?)
+    // 例: startWebSocket("localhost") → wss://localhost:8765
+    // 例: startWebSocket("localhost", 8765, "ws") → ws://localhost:8765
+    function startWebSocket(ip_address, port = 8765, protocol = "wss") {
         // 既存のWebSocket接続が存在する場合、それをクローズする
         if (ws && ws.readyState !== WebSocket.CLOSED) {
             ws.close();
         }
 
-        ws = new WebSocket(`wss://${ip_address}:8765`);
+        const protocolPrefix = protocol === "wss" ? "wss" : "ws";
+        const url = `${protocolPrefix}://${ip_address}:${port}`;
+        console.log("WebSocket connecting to:", url);
+        ws = new WebSocket(url);
 
         ws.onopen = function(event) {
             console.log("WebSocket connection established");
@@ -362,16 +368,21 @@
 
         ws.onclose = function(event) {
             console.log("WebSocket connection closed");
-            scheduleReconnect(ip_address); // 接続が閉じられたら再接続をスケジュール
+            scheduleReconnect(ip_address, port, protocol);
         };
 
         ws.onerror = function(event) {
             console.error("WebSocket error:", event);
-            scheduleReconnect(ip_address); // エラーが発生したら再接続をスケジュール
+            scheduleReconnect(ip_address, port, protocol);
         };
     }
 
-    function scheduleReconnect(ip_address) {
+    let connectionConfig = { host: null, port: 8765, protocol: "wss" };
+
+    function scheduleReconnect(ip_address, port, protocol) {
+        connectionConfig.host = ip_address;
+        connectionConfig.port = port !== undefined ? port : 8765;
+        connectionConfig.protocol = protocol !== undefined ? protocol : "wss";
         // 既に再接続がスケジュールされている場合は何もしない
         if (reconnectIntervalId) {
             return;
@@ -380,7 +391,7 @@
         console.log(`Attempting to reconnect in ${reconnectInterval / 1000} seconds...`);
         reconnectIntervalId = setInterval(() => {
             if (ws.readyState === WebSocket.CLOSED) {
-                startWebSocket(ip_address);
+                startWebSocket(connectionConfig.host, connectionConfig.port, connectionConfig.protocol);
             } else {
                 clearInterval(reconnectIntervalId); // 接続が確立されたら再接続タイマーを停止
                 reconnectIntervalId = null;

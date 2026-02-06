@@ -1,6 +1,6 @@
 # Eye-Agent JavaScript Library
 
-This JavaScript library allows you to display a simple eye-only agent on the web. It supports various features such as expressing emotions, blinking, and directing the gaze. You can control the agent either through JavaScript commands or by sending instructions via a secure WebSocket connection.
+This JavaScript library allows you to display a simple eye-only agent on the web. It supports various features such as expressing emotions, blinking, and directing the gaze. You can control the agent either through JavaScript commands or by sending instructions via a WebSocket connection (ws or wss).
 
 ![An animated demonstration](./image.gif)
 
@@ -90,15 +90,21 @@ For instance, `eyes.target(500, 0, 1000)` makes the agent look at a point 500 un
 This allows for precise control over where the agent "looks" based on coordinates in the 3D space, with any unit of measurement, adding more depth to the agent's visual interaction.
 
 ### Controlling the Agent via WebSocket
-To control the agent via WebSocket, connect to the server using a secure WebSocket connection and send commands. The web-eye-animation functions as a secure WebSocket client.
-```
-eyes.websocket("localhost")
-```
-To connect, you need to have a secure WebSocket server running separately.
+To control the agent via WebSocket, call `eyes.websocket(host, port?, protocol?)` and send commands from your server. Optional arguments default to `port = 8765` and `protocol = "wss"`.
 
-- emotion [emotion type]: Expresses the specified emotion. For a full list of available emotions, please refer to the "Controlling the Agent via JavaScript" section.
-- eye target [x] [y] [z] [focal length]: Directs the gaze to a specific 3D coordinate. For a detailed explanation, see the "Controlling the Agent via JavaScript" section.
-- eye [x] [y] [flag_rect]: Specifies the coordinates on the screen where the eyes should be positioned. For further details, please refer to the "Controlling the Agent via JavaScript" section.
+```javascript
+// WSS (default): connect to wss://localhost:8765
+eyes.websocket("localhost");
+
+// WS (e.g. local dev): connect to ws://localhost:8765
+eyes.websocket("localhost", 8765, "ws");
+```
+
+You need a WebSocket server that sends the following message formats:
+
+- **emotion** [emotion type]: Expresses the specified emotion. For a full list of available emotions, please refer to the "Controlling the Agent via JavaScript" section.
+- **eye target** [x] [y] [z] [focal length]: Directs the gaze to a specific 3D coordinate. For a detailed explanation, see the "Controlling the Agent via JavaScript" section.
+- **eye** [x] [y]: Specifies normalized coordinates (0–1) on the screen where the eyes should be positioned; the library multiplies them by the container size. For pixel-based control, use the "Controlling the Agent via JavaScript" section.
 
 ### License
 This project is licensed under the MIT License, allowing you to freely use, modify, and distribute it for both personal and commercial purposes.
