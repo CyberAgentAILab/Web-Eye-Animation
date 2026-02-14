@@ -55,8 +55,10 @@
     let isAnimating = false;
     let blinkTimeoutId = null;
     let ws;
-    let reconnectInterval = 5000; // 再接続の間隔（ミリ秒）
-    let reconnectIntervalId;
+    // 再接続は 5s → 10s → 20s → 40s → 80s の5回まで
+    const RECONNECT_SCHEDULE_MS = [5000, 10000, 20000, 40000, 80000];
+    let reconnectAttemptIndex = 0;
+    let reconnectTimeoutId = null;
 
     // GSAPの読み込み
     function loadGSAP(callback) {
@@ -329,9 +331,13 @@
         console.log("WebSocket connecting to:", url);
         ws = new WebSocket(url);
 
-        ws.onopen = function(event) {
+        ws.onopen = function() {
             console.log("WebSocket connection established");
-            clearInterval(reconnectIntervalId); // 接続が確立されたら再接続タイマーを停止
+            reconnectAttemptIndex = 0; // 次に切れたときはスケジュールを先頭から
+            if (reconnectTimeoutId) {
+                clearTimeout(reconnectTimeoutId);
+                reconnectTimeoutId = null;
+            }
         };
 
         ws.onmessage = function(event) {
@@ -366,7 +372,7 @@
             }
         };
 
-        ws.onclose = function(event) {
+        ws.onclose = function() {
             console.log("WebSocket connection closed");
             scheduleReconnect(ip_address, port, protocol);
         };
@@ -383,20 +389,24 @@
         connectionConfig.host = ip_address;
         connectionConfig.port = port !== undefined ? port : 8765;
         connectionConfig.protocol = protocol !== undefined ? protocol : "wss";
-        // 既に再接続がスケジュールされている場合は何もしない
-        if (reconnectIntervalId) {
+        if (reconnectTimeoutId) {
+            clearTimeout(reconnectTimeoutId);
+            reconnectTimeoutId = null;
+        }
+        if (reconnectAttemptIndex >= RECONNECT_SCHEDULE_MS.length) {
+            console.log("WebSocket: max reconnect attempts reached, giving up.");
             return;
         }
-
-        console.log(`Attempting to reconnect in ${reconnectInterval / 1000} seconds...`);
-        reconnectIntervalId = setInterval(() => {
+        const delayMs = RECONNECT_SCHEDULE_MS[reconnectAttemptIndex];
+        const delaySec = delayMs / 1000;
+        reconnectAttemptIndex += 1;
+        console.log(`WebSocket: reconnecting in ${delaySec}s (attempt ${reconnectAttemptIndex}/${RECONNECT_SCHEDULE_MS.length})...`);
+        reconnectTimeoutId = setTimeout(() => {
+            reconnectTimeoutId = null;
             if (ws.readyState === WebSocket.CLOSED) {
                 startWebSocket(connectionConfig.host, connectionConfig.port, connectionConfig.protocol);
-            } else {
-                clearInterval(reconnectIntervalId); // 接続が確立されたら再接続タイマーを停止
-                reconnectIntervalId = null;
             }
-        }, reconnectInterval);
+        }, delayMs);
     }
 
     // runEmotion関数をグローバル変数として定義
@@ -444,4 +454,22 @@
         move: moveEyes,
         target: moveEyesTarget,
     };
+
+    // meta タグがある場合のみページ読み込み時に自動接続（再接続は 5s→10s→20s→40s→80s の5回まで）
+    function autoConnectWebSocket() {
+        const hostMeta = document.querySelector("meta[name=\"websocket-host\"]");
+        const portMeta = document.querySelector("meta[name=\"websocket-port\"]");
+        const protocolMeta = document.querySelector("meta[name=\"websocket-protocol\"]");
+        if (!hostMeta) return;
+        const host = hostMeta.getAttribute("content") || "localhost";
+        const port = portMeta ? parseInt(portMeta.getAttribute("content"), 10) || 8765 : 8765;
+        const protocol = (protocolMeta && protocolMeta.getAttribute("content")) || "ws";
+        console.log("WebSocket auto-connect:", protocol + "://" + host + ":" + port);
+        startWebSocket(host, port, protocol);
+    }
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", autoConnectWebSocket);
+    } else {
+        autoConnectWebSocket();
+    }
 })();

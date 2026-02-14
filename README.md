@@ -100,7 +100,7 @@ eyes.websocket("localhost");
 eyes.websocket("localhost", 8765, "ws");
 ```
 
-You need a WebSocket server that sends the following message formats:
+A Python example (camera-based and simple demo) is in `example/python/`. You need a WebSocket server that sends the following message formats:
 
 - **emotion** [emotion type]: Expresses the specified emotion. For a full list of available emotions, please refer to the "Controlling the Agent via JavaScript" section.
 - **eye target** [x] [y] [z] [focal length]: Directs the gaze to a specific 3D coordinate. For a detailed explanation, see the "Controlling the Agent via JavaScript" section.

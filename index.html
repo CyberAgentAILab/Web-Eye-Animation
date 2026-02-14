@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eye animation capable of expressing multiple emotions and blinking</title>
+    <!-- あるとページ読み込み時に ws://localhost:8765 へ自動接続（失敗時は 5s→10s→20s→40s→80s で5回まで再試行） -->
+    <meta name="websocket-host" content="localhost">
+    <meta name="websocket-port" content="8765">
+    <meta name="websocket-protocol" content="ws">
 </head>
 <body>
     <div class="eye-container"></div>
